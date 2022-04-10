@@ -11,27 +11,44 @@ class PlayerData:
         self._userData = {}
         self._historyData = {}
         self._planetData = {}
+        self._userNames = []
 
         self.updateData()
     
     def updateData(self):
         logging.info("PlayerData: Updating data")
-        #Order matters
+        #_updateUserData needs to be first
         self._updateUserData()
         self._updateHistoryData()
+        self._updatePlanetData()
 
     def getUserData(self):
         return self._userData
+    
+    def getUserNames(self):
+        return self._userNames
 
     def getHistoryData(self):
         return self._historyData
+
+    def getPlanetData(self):
+        return self._planetData
+
+    def addPlanet(self, position, username):
+        self._userData[username]["planets"].append(position)
+        #save planet as file
 
     def _updateUserData(self):
         myData: MyData = self._fileHandler.getCurrentData()
         if(myData.valid):
             self._userData = myData.data
+            self._setupUserNames()
         else:
             logging.warning("PlayerData: Invalid userData to update")
+    
+    def _setupUserNames(self):
+        for user in self._userData:
+            self._userNames.append(user)
     
     def _updateHistoryData(self):
         historyData: MyData = self._fileHandler.getHistoryData()
@@ -57,3 +74,11 @@ class PlayerData:
                         #No history Data
                         if user in self._userData:
                             self._userData[user]["diff_"+ element] = "N/A"
+
+    def _updatePlanetData(self):
+        myData: MyData = self._fileHandler.getPlanetData()
+        if(myData.valid):
+            self._planetData = myData.data
+        else:
+            logging.warning("PlayerData: Invalid userData to update")
+

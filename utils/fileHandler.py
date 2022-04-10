@@ -16,11 +16,13 @@ class FileHandler:
         logging.info("FileHandler created")
         self._path = "files/"
         self._fileEnding = ".json"
-        self._currentData = MyData()
+        self._currentData = MyData({})
         self._historyData = MyData({})
+        self._planetData = MyData()
         self._sitesToParse = 10          #each site has 100 Player
         self._lastUpdate = "N/A"
         self._historyFileNames = self._path + "historyFileNames" + self._fileEnding
+        self._planetDataFile = self._path + "planetData" + self._fileEnding
 
     def getCurrentData(self):
         currentFileName = self._getCurrentFileName()
@@ -44,7 +46,6 @@ class FileHandler:
                     if day.valid:
                         for userName in day.data:
                             day.data[userName]["timestamp"] = file
-
                             if userName in self._historyData.data:
                                 self._historyData.data[userName].append(day.data[userName])
                             else:
@@ -58,7 +59,15 @@ class FileHandler:
 
     def getLastUpdate(self):
         return self._lastUpdate
+
+    def getPlanetData(self):
+        planetData: MyData = self._readFile(self._planetDataFile)
+
+        if planetData.valid:
+            self._planetData = planetData
         
+        return self._planetData
+
     def _getCurrentFileName(self):
         today = date.today()
         return self._path + today.strftime("%d_%m_%Y") + self._fileEnding
@@ -88,6 +97,7 @@ class FileHandler:
                 self._login(session)
                 playerPosAndId = self._parseStatisticSite(session)
                 myData.data = self._parsePlayerCards(session, playerPosAndId)
+                myData.valid= True
         except:
             myData.valid = False
             logging.error("FileHandler: Failed scrape Pr0game")
