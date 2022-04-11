@@ -68,6 +68,10 @@ class FileHandler:
         
         return self._planetData
 
+    def setPlanetData(self, data: dict):
+        self._planetData = data
+        self._writeFile(self._planetDataFile, data)
+
     def _getCurrentFileName(self):
         today = date.today()
         return self._path + today.strftime("%d_%m_%Y") + self._fileEnding
