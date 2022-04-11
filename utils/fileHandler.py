@@ -84,7 +84,17 @@ class FileHandler:
             logging.error(f"FileHandler: Failed to open file {filePath}")
         
         return myData
-        
+
+    def _writeFile(self, filePath: str, data: dict):
+        logging.info(f"Saving data to file {filePath}")
+        try:
+            with open(filePath, 'w') as file:
+                file.write(json.dumps(data))
+        except:
+            logging.error(f"FileHandler: Failed to save data to file: {filePath}")
+            return False
+        return True
+
     def _scrape(self):
         """ToDo: Move in seperate File"""
         logging.info("FileHandler: Start Scraping Pr0game ...")
@@ -103,20 +113,10 @@ class FileHandler:
             logging.error("FileHandler: Failed scrape Pr0game")
         
         if(myData.valid):
-            self._saveData(myData.data)
+            self._writeFile(self._getCurrentFileName(), myData.data)
             self._lastUpdate = date.today().strftime("%d_%m_%Y")
             
         return myData
-
-    def _saveData(self, data):
-        logging.info("FileHandler: Saving scraped Data")
-        currentFileName = self._getCurrentFileName()
-
-        try:
-            with open(currentFileName, 'w') as file:
-                file.write(json.dumps(data))
-        except:
-            logging.error("FileHandler: Failed to save scraped Data")
 
     def _parsePlayerCards(self, session, playerPosAndId):
         data = {}
