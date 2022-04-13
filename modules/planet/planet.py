@@ -2,7 +2,7 @@ import logging
 import re
 from discord.ext import commands
 
-from utils.playerData import PlayerData, DATATYPE
+from utils.playerData import PlayerData
 
 class Planet(commands.Cog):
     def __init__(self, bot: commands.bot):
@@ -10,9 +10,7 @@ class Planet(commands.Cog):
         self._PlayerData: PlayerData = PlayerData.instance()
         self._userNames: list = []
 
-        self._PlayerData.subscribe(DATATYPE.userNames, self.updateUserNames)
-
-        self.refresh()
+        self.setup()
     
     @commands.command(usage="<g>:<s>:<p> <username>",
                       brief="Speichert einen neuen Planeten",
@@ -25,15 +23,19 @@ class Planet(commands.Cog):
             await ctx.send('Spieler nicht gefunden')
             return
         try:
-            result = re.search("^(\d{1,3}):(\d{1,3}):(\d{1,3})$",position)
+            result = re.search("^(\d):(\d{1,3}):(\d{1,3})$",position)
             position = "{}:{}:{}".format(result.group(1),result.group(2),result.group(3))
         except:
             await ctx.send('Poisiton konnte nicht geparst werden\nz.B.: !planet 1:1:1 Name')
             return
         
-        self._addPlanet(position, username)
+        returnMsg: str
+        if self._addPlanet(position, username):
+            returnMsg = "Planet gespeichert"
+        else:
+            returnMsg = "Fehler beim Speichern des Planeten"
 
-        await ctx.send("TBD")
+        await ctx.send(returnMsg)
 
     @planet.error
     async def planet_error(self, ctx, error):
@@ -43,16 +45,12 @@ class Planet(commands.Cog):
             logging.error(error)
             await ctx.send('ZOMFG ¯\_(ツ)_/¯')
 
-    def refresh(self):
-        logging.info("Planet: Refreshing data")
-        self._userNames = self._PlayerData.getUserNames()
-    
-    def updateUserNames(self, userNames: dict):
-        logging.info("Planet: recieved subscribed UserNames")
-        self._userNames = userNames
+    def setup(self):
+        logging.info("Planet: Get Data references")
+        self._userNames = self._PlayerData.getUserNamesReference()
 
     def _addPlanet(self, position, user):
-        self._PlayerData.addPlanet(position, user)
+        return self._PlayerData.addPlanet(position, user)
 
 def setup(bot: commands.Bot):
     bot.add_cog(Planet(bot))

@@ -1,7 +1,7 @@
 import logging
 from discord.ext import commands
 
-from utils.playerData import PlayerData, DATATYPE
+from utils.playerData import PlayerData
 
 class Allianz(commands.Cog):
     def __init__(self, bot: commands.bot):
@@ -9,9 +9,7 @@ class Allianz(commands.Cog):
         self._PlayerData: PlayerData = PlayerData.instance()
         self._allianzData: dict = {}
 
-        self._PlayerData.subscribe(DATATYPE.allianzData, self.updateAllianzData)
-
-        self.refresh()
+        self.setup()
     
     @commands.command()
     async def allianz(self, ctx: commands.context, *,allianzName):
@@ -32,13 +30,9 @@ class Allianz(commands.Cog):
             logging.error(error)
             await ctx.send('ZOMFG ¯\_(ツ)_/¯')
 
-    def refresh(self):
-        logging.info("Allianz: Refreshing data")
-        self._allianzData = self._PlayerData.getAllianzData()
-
-    def updateAllianzData(self, allianzData: dict):
-        logging.info("Allianz: recieved subscribed AllianzData")
-        self._allianzData = allianzData
+    def setup(self):
+        logging.info("Allianz: Get Data references")
+        self._allianzData = self._PlayerData.getAllianzDataReference()
 
     def _getAllianzString(self, allianzName):
         returnMsg = f"```Top 10 von Allianz {allianzName}\n"

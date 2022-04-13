@@ -70,7 +70,7 @@ class FileHandler:
 
     def setPlanetData(self, data: dict):
         self._planetData = data
-        self._writeFile(self._planetDataFile, data)
+        return self._writeFile(self._planetDataFile, data)
 
     def _getCurrentFileName(self):
         today = date.today()

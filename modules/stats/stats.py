@@ -1,7 +1,7 @@
 import logging
 from discord.ext import commands
 
-from utils.playerData import PlayerData, DATATYPE
+from utils.playerData import PlayerData
 
 class Stats(commands.Cog):
     def __init__(self, bot: commands.bot):
@@ -11,10 +11,8 @@ class Stats(commands.Cog):
         self._userData: dict = {}
         self._historyData: dict = {}
 
-        self._PlayerData.subscribe(DATATYPE.userData, self.updateUserData)
-        self._PlayerData.subscribe(DATATYPE.historyData, self.updateHistoryData)
         
-        self.refresh()
+        self.setup()
     
     @commands.command()
     async def stats(self, ctx: commands.context, username: str):
@@ -44,18 +42,10 @@ class Stats(commands.Cog):
             logging.error(error)
             await ctx.send('ZOMFG ¯\_(ツ)_/¯')
 
-    def refresh(self):
-        logging.info("Stats: Refreshing data")
-        self._userData = self._PlayerData.getUserData()
-        self._historyData = self._PlayerData.getHistoryData()
-
-    def updateUserData(self, userData: dict):
-        logging.info("Stats: recieved subscribed UserData")
-        self._userData = userData
-    
-    def updateHistoryData(self, historyData: dict):
-        logging.info("Stats: recieved subscribed HistoryData")
-        self._userData = historyData
+    def setup(self):
+        logging.info("Stats: Get Data references")
+        self._userData = self._PlayerData.getUserDataReference()
+        self._historyData = self._PlayerData.getHistoryDataReference()
 
     def _getHistoryString(self, username):
         if not username in self._historyData:

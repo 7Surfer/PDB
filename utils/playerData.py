@@ -1,17 +1,8 @@
-from enum import Enum
 import logging
-from pyclbr import Function
 
 from utils.singleton import Singleton
 from utils.myData import MyData
 from utils.fileHandler import FileHandler
-
-
-class DATATYPE(Enum):
-    userData = 1
-    historyData = 2
-    allianzData = 3
-    userNames = 4
 
 
 @Singleton
@@ -23,7 +14,6 @@ class PlayerData:
         self._planetData = {}
         self._allianzData = {}
         self._userNames = []
-        self._subscriptions = {}
 
         self.updateData()
     
@@ -34,58 +24,26 @@ class PlayerData:
         self._updateHistoryData()
         self._updatePlanetData()
 
-    def getUserData(self):
+    def getUserDataReference(self):
         return self._userData
     
-    def getUserNames(self):
+    def getUserNamesReference(self):
         return self._userNames
 
-    def getHistoryData(self):
+    def getHistoryDataReference(self):
         return self._historyData
 
-    def getAllianzData(self):
+    def getAllianzDataReference(self):
         return self._allianzData
-
-    def getPlanetData(self):
-        return self._planetData
 
     def addPlanet(self, position, username):
         #savePlanetData on currentClass
         self._planetData[username].append(position)
-        self._userData[username]["planets"].append(position)
 
         #save planet as file
-        self._fileHandler.setPlanetData(self._planetData)
-
-        #Upadte all cogs who depend on planetData
-        self._publish([DATATYPE.userData])
-
-    def subscribe(self, dataType: DATATYPE, callback: Function ):
-        if dataType in self._subscriptions:
-            self._subscriptions[dataType].append(callback)
-        else:
-            self._subscriptions[dataType] = [callback]
-
-    def _publish(self, datatypes: list):
-        for datatype in datatypes:
-            logging.info(f"PlayerData: Publish {datatype}")
-            match datatype:
-                case DATATYPE.userData:
-                    for subscriber in self._subscriptions[datatype]:
-                        print(subscriber)
-                        subscriber(self._userData)
-                case DATATYPE.historyData:
-                    for subscriber in self._subscriptions[datatype]:
-                        print(subscriber)
-                        subscriber(self._historyData)
-                case DATATYPE.allianzData:
-                    for subscriber in self._subscriptions[datatype]:
-                        print(subscriber)
-                        subscriber(self._allianzData)
-                case DATATYPE.userNames:
-                    for subscriber in self._subscriptions[datatype]:
-                        print(subscriber)
-                        subscriber(self._userNames)
+        result = self._fileHandler.setPlanetData(self._planetData)
+        
+        return result
 
     def _updateUserData(self):
         myData: MyData = self._fileHandler.getCurrentData()
@@ -127,7 +85,7 @@ class PlayerData:
 
     def _updatePlanetData(self):
         myData: MyData = self._fileHandler.getPlanetData()
-        if(myData.valid):
+        if myData.valid:
             self._planetData = myData.data
         else:
             logging.warning("PlayerData: Invalid userData to update")
