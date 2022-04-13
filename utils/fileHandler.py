@@ -90,7 +90,7 @@ class FileHandler:
         return myData
 
     def _writeFile(self, filePath: str, data: dict):
-        logging.info(f"Saving data to file {filePath}")
+        logging.info(f"FileHandler: Saving data to file {filePath}")
         try:
             with open(filePath, 'w') as file:
                 file.write(json.dumps(data))

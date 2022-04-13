@@ -2,14 +2,17 @@ import logging
 import re
 from discord.ext import commands
 
-from utils.playerData import PlayerData
+from utils.playerData import PlayerData, DATATYPE
 
 class Planet(commands.Cog):
     def __init__(self, bot: commands.bot):
         self._bot: commands.bot = bot
         self._PlayerData: PlayerData = PlayerData.instance()
         self._userNames: list = []
-        self.updateData()
+
+        self._PlayerData.subscribe(DATATYPE.userNames, self.updateUserNames)
+
+        self.refresh()
     
     @commands.command(usage="<g>:<s>:<p> <username>",
                       brief="Speichert einen neuen Planeten",
@@ -30,7 +33,6 @@ class Planet(commands.Cog):
         
         self._addPlanet(position, username)
 
-        print(self._planetData[username])
         await ctx.send("TBD")
 
     @planet.error
@@ -41,10 +43,13 @@ class Planet(commands.Cog):
             logging.error(error)
             await ctx.send('ZOMFG ¯\_(ツ)_/¯')
 
-    def updateData(self):
-        logging.info("Planet: Updating data")
+    def refresh(self):
+        logging.info("Planet: Refreshing data")
         self._userNames = self._PlayerData.getUserNames()
-        self._planetData = self._PlayerData.getPlanetData()
+    
+    def updateUserNames(self, userNames: dict):
+        logging.info("Planet: recieved subscribed UserNames")
+        self._userNames = userNames
 
     def _addPlanet(self, position, user):
         self._PlayerData.addPlanet(position, user)

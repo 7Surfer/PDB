@@ -1,14 +1,17 @@
 import logging
 from discord.ext import commands
 
-from utils.playerData import PlayerData
+from utils.playerData import PlayerData, DATATYPE
 
 class Allianz(commands.Cog):
     def __init__(self, bot: commands.bot):
         self._bot: commands.bot = bot
         self._PlayerData: PlayerData = PlayerData.instance()
         self._allianzData: dict = {}
-        self.updateData()
+
+        self._PlayerData.subscribe(DATATYPE.allianzData, self.updateAllianzData)
+
+        self.refresh()
     
     @commands.command()
     async def allianz(self, ctx: commands.context, *,allianzName):
@@ -29,13 +32,14 @@ class Allianz(commands.Cog):
             logging.error(error)
             await ctx.send('ZOMFG ¯\_(ツ)_/¯')
 
-    def updateData(self):
-        logging.info("Allianz: Updating data")
+    def refresh(self):
+        logging.info("Allianz: Refreshing data")
+        self._allianzData = self._PlayerData.getAllianzData()
 
-        userData: dict = self._PlayerData.getUserData()
-        fullAllianzData: dict = self._getAllAllianzMember(userData)
-        self._allianzData: dict = self._getAllTopAllianzMembers(fullAllianzData)
-  
+    def updateAllianzData(self, allianzData: dict):
+        logging.info("Allianz: recieved subscribed AllianzData")
+        self._allianzData = allianzData
+
     def _getAllianzString(self, allianzName):
         returnMsg = f"```Top 10 von Allianz {allianzName}\n"
         returnMsg +="{:1} {:4} {:20} {:<10} {:10} \n\n".format("","","Name", "Punkte", "Flotte")
@@ -58,27 +62,6 @@ class Allianz(commands.Cog):
                                                                 userData["gesamt"],
                                                                 userData["flotte"])
         return returnMsg + "```"
-
-    def _getAllAllianzMember(self, userdata: dict):
-        fullAllianzData = {}
-        for user in userdata:
-            name: str = userdata[user]["allianz"].lower().strip()
-            if name in fullAllianzData:
-                fullAllianzData[name].append(userdata[user])
-            else:
-                fullAllianzData[name] = [userdata[user]]
-        
-        return fullAllianzData
-    
-    def _getAllTopAllianzMembers(self, fullAllianzData: dict):
-        topAllianzUsers = {}
-        for allianzName in fullAllianzData:
-            allianzUsers: list = fullAllianzData[allianzName]
-            
-            #sort users by rank and keep only top 10
-            topAllianzUsers[allianzName] = sorted(allianzUsers,key=lambda d: d['platz'])[:10]
-        
-        return topAllianzUsers
 
 def setup(bot: commands.Bot):
     bot.add_cog(Allianz(bot))
