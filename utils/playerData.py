@@ -45,6 +45,13 @@ class PlayerData:
         
         return result
 
+    def delPlanet(self, position, username):
+        self._planetData[username].remove(position)
+
+        result = self._fileHandler.setPlanetData(self._planetData)
+        
+        return result
+
     def _updateUserData(self):
         myData: MyData = self._fileHandler.getCurrentData()
         if(myData.valid):
