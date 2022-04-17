@@ -2,7 +2,7 @@ import logging
 from discord.ext import commands
 
 from utils.playerData import PlayerData
-from utils.auth import Auth
+from utils.auth import AuthHandler
 
 class Allianz(commands.Cog):
     def __init__(self, bot: commands.bot):
@@ -12,7 +12,7 @@ class Allianz(commands.Cog):
 
         self.setup()
     
-    @commands.check(Auth.instance().check)
+    @commands.check(AuthHandler.instance().check)
     @commands.command()
     async def allianz(self, ctx: commands.context, *,allianzName):
         """Zeigt die Top 10 Spieler der Allianz <allianzname> an"""

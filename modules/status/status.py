@@ -2,7 +2,7 @@ import logging
 
 from discord.ext import commands
 from utils.fileHandler import FileHandler
-from utils.auth import Auth
+from utils.auth import AuthHandler
 
 class Status(commands.Cog):
     def __init__(self, bot: commands.bot):
@@ -10,13 +10,13 @@ class Status(commands.Cog):
         self.FileHandler = FileHandler.instance()
         self.lastUpdate = "N/A"
     
-    @commands.check(Auth.instance().check)
+    @commands.check(AuthHandler.instance().check)
     @commands.command()
     async def test(self, ctx: commands.context):
         """Antwortet mit \"Test Bestanden\" (Verbindungstest)"""
         await ctx.send('Test bestanden')
 
-    @commands.check(Auth.instance().check)
+    @commands.check(AuthHandler.instance().check)
     @commands.command()
     async def status(self, ctx: commands.context):
         """Stand des Datensatzes"""

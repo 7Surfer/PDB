@@ -3,7 +3,7 @@ import re
 from discord.ext import commands
 
 from utils.playerData import PlayerData
-from utils.auth import Auth
+from utils.auth import AuthHandler
 
 class Planet(commands.Cog):
     def __init__(self, bot: commands.bot):
@@ -16,7 +16,7 @@ class Planet(commands.Cog):
     @commands.command(usage="<g>:<s>:<p> <username>",
                       brief="Speichert einen neuen Planeten",
                       help="Speichert den Planet an position <g>:<s>:<p> zu dem spieler <username> ab")
-    @commands.check(Auth.instance().check)
+    @commands.check(AuthHandler.instance().check)
     async def planet(self, ctx: commands.context, position: str, username: str):
         position = position.lower()
         username = username.lower()
@@ -39,7 +39,7 @@ class Planet(commands.Cog):
 
         await ctx.send(returnMsg)
 
-    @commands.check(Auth.instance().check)
+    @commands.check(AuthHandler.instance().check)
     @commands.command(usage="<g>:<s>:<p> <username>",
                       brief="Löscht einen Planeten",
                       help="Löscht den Planet an position <g>:<s>:<p> von dem spieler <username>")

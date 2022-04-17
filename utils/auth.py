@@ -6,7 +6,7 @@ from utils.myData import MyData
 
 
 @Singleton
-class Auth:
+class AuthHandler:
     def __init__(self):
         self._fileHandler: FileHandler = FileHandler.instance()
         self._authData: dict = {}
@@ -25,8 +25,9 @@ class Auth:
         self._setup()
     
     def check(self, ctx):
-        return str(ctx.author) in self._authData[str(ctx.command)] or\
-               str(ctx.author) in self._authData["op"]
+        author = str(ctx.author).lower()
+        return author in self._authData[str(ctx.command)] or\
+               author in self._authData["op"]
     
     def add(self, user: str , fields: str):
         if fields == "normal":
@@ -34,8 +35,8 @@ class Auth:
                 if not user in self._authData[command]:
                     self._authData[command].append(user)
         elif fields in self._authData:
-            if not user in self._authData[command]:
-                self._authData[command].append(user)
+            if not user in self._authData[fields]:
+                self._authData[fields].append(user)
         
         return self._fileHandler.setAuthData(self._authData)
     
@@ -49,8 +50,8 @@ class Auth:
                 if user in self._authData[command]:
                     self._authData[command].remove(user)
         elif fields in self._authData:
-            if user in self._authData[command]:
-                self._authData[command].remove(user)
+            if user in self._authData[fields]:
+                self._authData[fields].remove(user)
         
         return self._fileHandler.setAuthData(self._authData)
 

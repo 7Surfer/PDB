@@ -3,7 +3,7 @@ from discord.ext import commands
 from quickchart import QuickChart
 
 from utils.playerData import PlayerData
-from utils.auth import Auth
+from utils.auth import AuthHandler
 
 class Stats(commands.Cog):
     def __init__(self, bot: commands.bot):
@@ -16,21 +16,21 @@ class Stats(commands.Cog):
         
         self.setup()
     
-    @commands.check(Auth.instance().check)
+    @commands.check(AuthHandler.instance().check)
     @commands.command()
     async def stats(self, ctx: commands.context, username: str):
         """Zeigt die Werte des Spielers <username> an"""
         username = username.lower()
         await ctx.send(self._getStatsString(username))
 
-    @commands.check(Auth.instance().check)
+    @commands.check(AuthHandler.instance().check)
     @commands.command()
     async def history(self, ctx: commands.context, username: str):
         """Zeigt die Historie des Spielers <username> an"""
         username = username.lower()
         await ctx.send(self._getHistoryString(username))
 
-    @commands.check(Auth.instance().check)
+    @commands.check(AuthHandler.instance().check)
     @commands.command(usage="<username> [size]",
                       brief="Zeigt eine Diagramm an",
                       help="Zeigt ein Diagramm für den User <username> an. Die größe wird über den optionalen " +
