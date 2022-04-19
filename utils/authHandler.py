@@ -65,7 +65,7 @@ class AuthHandler:
         elif fields == "poll":
             for command in self._poll:
                 if user in self._authData[command]:
-                    self._authData[command].append(user)
+                    self._authData[command].remove(user)
         elif fields == "all":
             for command in self._authData:
                 if user in self._authData[command]:
