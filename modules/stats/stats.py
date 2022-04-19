@@ -153,6 +153,7 @@ class Stats(commands.Cog):
                 lastPoints = int(last["gesamt"].replace(".",""))
                 currentPoints = int(current["gesamt"].replace(".",""))
                 cUsername = current["username"]
+
                 if lastPoints >= currentPoints:
                     if cUsername in self._userData:
                         for planet in self._userData[cUsername]["planets"]:
@@ -165,7 +166,7 @@ class Stats(commands.Cog):
                                     break
                 else:
                     inactiveData.pop(user,None)
-            last = current
+                last = current
         return inactiveData
 
     def _getChartURL(self, chartData: dict, size: str):
