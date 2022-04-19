@@ -17,7 +17,6 @@ def main():
     #Initialize PlayerData
     playerData = PlayerData.instance()
 
-    print(os.path.abspath(os.getcwd()))
     for name in os.listdir(os.path.join(os.path.abspath(os.getcwd()),"modules")):
         if os.path.exists(os.path.join("modules", name)):
             client.load_extension(f"modules.{name}.{name}")
