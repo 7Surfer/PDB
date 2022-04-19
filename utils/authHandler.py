@@ -20,7 +20,8 @@ class AuthHandler:
             "stats",
             "status",
             "test",
-            "link"
+            "link",
+            "inactive"
         ]
         self._poll = [
             "allianz",
@@ -32,7 +33,8 @@ class AuthHandler:
             "stats",
             "status",
             "test",
-            "link"
+            "link",
+            "inactive"
         ]
 
         self._setup()
